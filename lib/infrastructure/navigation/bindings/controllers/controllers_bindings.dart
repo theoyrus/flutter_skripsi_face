@@ -1,0 +1,12 @@
+export './auth_login.controller.binding.dart';
+export './auth_register.controller.binding.dart';
+export './beranda.controller.binding.dart';
+export './citrawajah_my.controller.binding.dart';
+export './citrawajah_tambah.controller.binding.dart';
+export './home.controller.binding.dart';
+export './presensi_utama.controller.binding.dart';
+export './report_utama.controller.binding.dart';
+export './setting_general.controller.binding.dart';
+export './setting_profile.controller.binding.dart';
+export './setting_tampilan.controller.binding.dart';
+export './splashscreen.controller.binding.dart';
