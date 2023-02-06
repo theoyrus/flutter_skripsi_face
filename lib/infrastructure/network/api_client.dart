@@ -13,15 +13,15 @@ import 'api_interceptor.dart';
 class ApiClient {
   final Dio _dio = Dio(BaseOptions(
     baseUrl: Env.baseUrl,
-    connectTimeout: 5000,
-    receiveTimeout: 5000,
+    connectTimeout: 3000,
+    receiveTimeout: 3000,
   ));
 
   final Dio http = Dio(BaseOptions(
     // custom interceptor
     baseUrl: Env.baseUrl,
-    connectTimeout: 5000,
-    receiveTimeout: 5000,
+    connectTimeout: 3000,
+    receiveTimeout: 3000,
   ));
   Dio get dio => _dio;
 
@@ -37,8 +37,8 @@ class ApiClient {
       retries: 2, // retry count (optional)
       retryDelays: const [
         // set delays between retries (optional)
-        Duration(seconds: 3), // wait 5 sec before first retry
-        Duration(seconds: 6), // wait 6 sec before second retry
+        Duration(seconds: 2), // wait 2 sec before first retry
+        Duration(seconds: 3), // wait 3 sec before second retry
         // Duration(seconds: 10), // wait 3 sec before third retry
       ],
       // retryEvaluator: null,
@@ -107,7 +107,6 @@ class ApiClient {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      print('tipe: ${data.runtimeType}');
       final response = await dio.put(
         Uri.encodeFull(endpoint),
         data: data,
@@ -158,16 +157,15 @@ class ApiClient {
 
   static getErrorString(DioError error) {
     var errData = DioExceptions.fromDioError(error);
-    print(
-        'errdata has response?: ${errData.errorResponse} isi errdata: $errData, isi error: ${errData.error} tipe error: ${errData.error.runtimeType}');
+    // print('errdata has response?: ${errData.errorResponse} isi errdata: $errData, isi error: ${errData.error} tipe error: ${errData.error.runtimeType}');
     if (errData.errorResponse) {
       if (errData.message.contains('Bad request')) {
-        print('errdata non detail');
+        // print('errdata non detail');
         var parsed = ApiError.fromJson(errData.error);
 
         return parsed.error?.data.toString();
       } else {
-        print('errdata detail');
+        // print('errdata detail');
         var parsed = ApiError.fromJson(errData.error);
 
         return parsed.error?.data['detail'];

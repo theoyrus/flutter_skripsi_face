@@ -25,3 +25,28 @@ class AppColors {
   });
   static const int _presensiAccentValue = 0xFF939DFF;
 }
+
+ColorScheme appColorSchemeLight() {
+  return ColorScheme.fromSwatch(
+    primarySwatch: AppColors.presensi,
+  );
+}
+
+ColorScheme appColorSchemeDark() {
+  return ColorScheme.fromSwatch(
+    primarySwatch: AppColors.presensi,
+    primaryColorDark: AppColors.presensi[50],
+  );
+}
+
+ThemeData themeDataLight() {
+  return ThemeData.light().copyWith(
+    colorScheme: appColorSchemeLight(),
+  );
+}
+
+ThemeData themeDataDark() {
+  return ThemeData.dark().copyWith(
+    colorScheme: appColorSchemeDark(),
+  );
+}

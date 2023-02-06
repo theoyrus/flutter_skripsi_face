@@ -64,17 +64,8 @@ class Main extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
       getPages: Nav.routes,
-      theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: AppColors.presensi,
-        ),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: AppColors.presensi,
-          primaryColorDark: AppColors.presensi[50],
-        ),
-      ),
+      theme: themeDataLight(),
+      darkTheme: themeDataDark(),
       themeMode: Get.put(ThemeController()).isDark.value
           ? ThemeMode.dark
           : ThemeMode.light,

@@ -32,6 +32,7 @@ class ApiInterceptor extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
+    super.onError(err, handler);
     var uri = err.requestOptions.uri;
     var msg = '${DateTime.now()} ERROR[${err.response?.statusCode}]';
     var errData = DioExceptions.fromDioError(err);
@@ -47,15 +48,15 @@ class ApiInterceptor extends Interceptor {
       // Get.snackbar('Me-refresh', 'Sesi ...');
       AuthService().refreshToken().then((res) {
         // ketika sukses refresh token, coba retry
-        _retry(err.requestOptions);
+        // _retry(err.requestOptions);
       }).catchError((_) {
         // jika tidak bisa refresh token, arahkan ke login
         Get.offAllNamed(Routes.AUTH_LOGIN);
       });
+      return handler.next(err);
     } else if (err.response?.statusCode == 404) {
       return;
     }
-    super.onError(err, handler);
     // return handler.next(err);
   }
 

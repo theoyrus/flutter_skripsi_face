@@ -175,7 +175,7 @@ class MLKitService {
       final imageData = imglib.encodeJpg(image!);
       return Future.value(imageData);
     } catch (e) {
-      print('Error decoding image: $e');
+      // print('Error decoding image: $e');
       return Future.value(null);
     }
   }
