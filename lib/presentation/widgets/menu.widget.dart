@@ -55,7 +55,7 @@ class MenuTilesWidget extends StatelessWidget {
               height: 45,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
-                color: const Color(0xFFE5E5E5),
+                // color: const Color(0xFFE5E5E5),
               ),
               child: Center(child: Icon(icon)),
             ),

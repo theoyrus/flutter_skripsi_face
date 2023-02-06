@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../domain/karyawan/karyawan.provider.dart';
 import '../../../infrastructure/navigation/routes.dart';
 import '../../auth/login/controllers/auth_login.controller.dart';
 import '../../widgets/menu.widget.dart';
 import '../../widgets/profile_card.widget.dart';
-import '../profile/setting_profile.screen.dart';
 import 'controllers/setting_general.controller.dart';
 
 class SettingGeneralScreen extends GetView<SettingGeneralController> {
@@ -45,16 +45,19 @@ class SettingGeneralScreen extends GetView<SettingGeneralController> {
           MenuTilesWidget(
             title: 'Data Karyawan',
             description: 'Profil Individu',
+            icon: Icons.account_circle,
             onTap: () => Get.toNamed(Routes.SETTING_PROFILE),
           ),
           MenuTilesWidget(
             title: 'Data Wajah',
             description: 'Perekaman Data Wajah',
+            icon: MdiIcons.faceRecognition,
             onTap: () => Get.toNamed(Routes.CITRAWAJAH_MY),
           ),
           MenuTilesWidget(
             title: 'Logout',
             description: 'Keluar sistem',
+            icon: Icons.logout,
             onTap: () {
               Get.find<AuthLoginController>().authLogout();
             },
@@ -63,31 +66,11 @@ class SettingGeneralScreen extends GetView<SettingGeneralController> {
           MenuTilesWidget(
             title: 'Pengaturan',
             description: 'Kustomisasi aplikasi',
+            icon: Icons.settings_display_outlined,
             onTap: () => Get.toNamed(Routes.SETTING_TAMPILAN),
           ),
         ],
       ),
-    );
-  }
-}
-
-class ListData extends StatelessWidget {
-  String text;
-  ListData({
-    required this.text,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        color: Colors.red,
-        height: 50,
-        padding: const EdgeInsets.all(10),
-        child: Text(text, style: const TextStyle(fontSize: 20)),
-      ),
-      onTap: () => Get.to(() => const SettingProfileScreen()),
     );
   }
 }
