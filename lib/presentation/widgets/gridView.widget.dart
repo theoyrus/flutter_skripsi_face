@@ -9,7 +9,8 @@ import 'longText.widget.dart';
 class ImageItem {
   final String image;
   final String name;
-  ImageItem(this.image, this.name);
+  final Map<String, dynamic>? data;
+  ImageItem(this.image, this.name, [this.data]);
 }
 
 class GridViewWidget extends StatelessWidget {
@@ -20,15 +21,18 @@ class GridViewWidget extends StatelessWidget {
   final ValueChanged<int>? onTap;
   final ValueChanged<int>? onDoubleTap;
 
-  const GridViewWidget({
-    Key? key,
-    required this.items,
-    required this.crossAxisCount,
-    this.mainAxisSpacing,
-    this.crossAxisSpacing,
-    this.onTap,
-    this.onDoubleTap,
-  }) : super(key: key);
+  final ScrollController? scrollController;
+
+  const GridViewWidget(
+      {Key? key,
+      required this.items,
+      required this.crossAxisCount,
+      this.mainAxisSpacing,
+      this.crossAxisSpacing,
+      this.onTap,
+      this.onDoubleTap,
+      this.scrollController})
+      : super(key: key);
 
   static List<ImageItem> sampleItems = [
     ImageItem(
@@ -48,6 +52,7 @@ class GridViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      controller: scrollController,
       shrinkWrap: true,
       physics: const ScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -100,7 +105,7 @@ class ImageCardWidget extends StatelessWidget {
             Expanded(child: ImageNetCachedLoad(context)),
           if (isValidPath(item.image)) Expanded(child: ImageLocal()),
           LongText(
-            text: item.image,
+            text: item.name,
             textOverflow: TextOverflow.ellipsis,
           )
         ],

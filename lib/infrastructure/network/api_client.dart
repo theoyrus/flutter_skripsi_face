@@ -13,15 +13,15 @@ import 'api_interceptor.dart';
 class ApiClient {
   final Dio _dio = Dio(BaseOptions(
     baseUrl: Env.baseUrl,
-    connectTimeout: 3000,
-    receiveTimeout: 3000,
+    connectTimeout: 1000,
+    receiveTimeout: 1000,
   ));
 
   final Dio http = Dio(BaseOptions(
     // custom interceptor
     baseUrl: Env.baseUrl,
-    connectTimeout: 3000,
-    receiveTimeout: 3000,
+    connectTimeout: 1000,
+    receiveTimeout: 1000,
   ));
   Dio get dio => _dio;
 
@@ -34,11 +34,11 @@ class ApiClient {
     dio.interceptors.add(RetryInterceptor(
       dio: dio,
       logPrint: print, // specify log function (optional)
-      retries: 2, // retry count (optional)
+      retries: 1, // retry count (optional)
       retryDelays: const [
         // set delays between retries (optional)
-        Duration(seconds: 2), // wait 2 sec before first retry
-        Duration(seconds: 3), // wait 3 sec before second retry
+        Duration(seconds: 1), // wait 2 sec before first retry
+        // Duration(seconds: 1), // wait 3 sec before second retry
         // Duration(seconds: 10), // wait 3 sec before third retry
       ],
       // retryEvaluator: null,
@@ -123,7 +123,7 @@ class ApiClient {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      final response = await dio.get(
+      final response = await dio.delete(
         Uri.encodeFull(endpoint),
         options: Options(headers: headers ?? getHeaders()),
       );
@@ -160,6 +160,11 @@ class ApiClient {
     // print('errdata has response?: ${errData.errorResponse} isi errdata: $errData, isi error: ${errData.error} tipe error: ${errData.error.runtimeType}');
     if (errData.errorResponse) {
       if (errData.message.contains('Bad request')) {
+        // print('errdata non detail');
+        var parsed = ApiError.fromJson(errData.error);
+
+        return parsed.error?.data.toString();
+      } else if (errData.message.contains('Internal server error')) {
         // print('errdata non detail');
         var parsed = ApiError.fromJson(errData.error);
 

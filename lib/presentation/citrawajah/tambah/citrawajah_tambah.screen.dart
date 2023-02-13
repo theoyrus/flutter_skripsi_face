@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../domain/face_detect/views/camera.screen.dart';
@@ -23,22 +24,33 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
         init: CitrawajahTambahController(),
         initState: (_) {},
         builder: (_) {
-          return Stack(children: [
-            CameraScreen(
-              onFaceDetected: ({cameraImage, faces, statusProses}) {
-                controller.onFaceDetected(
-                  faces: faces,
-                  camImg: cameraImage,
-                  statusProses: statusProses,
+          return controller.cameraReady
+              ? Stack(children: [
+                  CameraScreen(
+                    onFaceDetected: ({cameraImage, faces, statusProses}) {
+                      controller.onFaceDetected(
+                        faces: faces,
+                        camImg: cameraImage,
+                        statusProses: statusProses,
+                      );
+                      if (statusProses == 'ONDONE') panelCtrl.open();
+                    },
+                  ),
+                  SlideUpWidget(
+                    panelCtrl: panelCtrl,
+                    panel: panelSlideUp(),
+                  ),
+                  // Load a Lottie file from your assets
+                  Obx(
+                    () => Visibility(
+                      visible: controller.faceCaptured.isTrue,
+                      child: Lottie.asset('assets/lotties/face-ok.json'),
+                    ),
+                  ),
+                ])
+              : const Center(
+                  child: CircularProgressIndicator(),
                 );
-                if (statusProses == 'ONDONE') panelCtrl.open();
-              },
-            ),
-            SlideUpWidget(
-              panelCtrl: panelCtrl,
-              panel: panelSlideUp(),
-            ),
-          ]);
         },
       ),
     );
@@ -82,12 +94,19 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buttonPanel(
-            label: 'Proses Semua',
-            icon: Icons.check,
-            color: Colors.green,
-            onTap: () => controller.tambahCitra,
-          ),
+          !controller.streamDone
+              ? buttonPanel(
+                  label: 'Selesai',
+                  icon: Icons.check,
+                  color: Colors.blue,
+                  onTap: () => controller.streamFinish(),
+                )
+              : buttonPanel(
+                  label: 'Proses Semua',
+                  icon: Icons.check,
+                  color: Colors.green,
+                  onTap: () => controller.tambahCitra(),
+                ),
           buttonPanel(
             label: 'Ulangi',
             icon: Icons.replay_outlined,
@@ -100,6 +119,13 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
       ),
       const SizedBox(
         height: 20.0,
+      ),
+      Center(
+          child: Text(controller.croppedImageItems.isNotEmpty
+              ? 'Ketuk dua kali untuk menghapus citra'
+              : 'Belum ada citra, mohon lakukan perekaman citra wajah.')),
+      const SizedBox(
+        height: 10.0,
       ),
       Container(
         padding: const EdgeInsets.only(left: 24.0, right: 24.0),

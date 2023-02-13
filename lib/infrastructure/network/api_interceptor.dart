@@ -54,8 +54,6 @@ class ApiInterceptor extends Interceptor {
         Get.offAllNamed(Routes.AUTH_LOGIN);
       });
       return handler.next(err);
-    } else if (err.response?.statusCode == 404) {
-      return;
     }
     // return handler.next(err);
   }
