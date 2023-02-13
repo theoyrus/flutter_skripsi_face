@@ -410,6 +410,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
+  flutter_smart_dialog:
+    dependency: "direct main"
+    description:
+      name: flutter_smart_dialog
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.8.2+4"
   flutter_svg:
     dependency: transitive
     description:
@@ -567,6 +574,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.1"
+  lazy_load_scrollview:
+    dependency: "direct main"
+    description:
+      name: lazy_load_scrollview
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.0"
   lints:
     dependency: transitive
     description:
@@ -581,6 +595,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  lottie:
+    dependency: "direct main"
+    description:
+      name: lottie
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0"
   matcher:
     dependency: transitive
     description:
@@ -784,6 +805,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
+  pull_to_refresh:
+    dependency: "direct main"
+    description:
+      name: pull_to_refresh
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   quiver:
     dependency: transitive
     description:

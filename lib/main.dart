@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -69,6 +70,8 @@ class Main extends StatelessWidget {
       themeMode: Get.put(ThemeController()).isDark.value
           ? ThemeMode.dark
           : ThemeMode.light,
+      navigatorObservers: [FlutterSmartDialog.observer],
+      builder: FlutterSmartDialog.init(),
     );
   }
 }
