@@ -197,7 +197,7 @@ class _CameraViewState extends State<CameraView> {
   }
 
   Future _processCameraImage(CameraImage image) async {
-    debugPrint('====> planes length ${image.planes.length}');
+    // debugPrint('====> planes length ${image.planes.length}');
     final WriteBuffer allBytes = WriteBuffer();
     for (final Plane plane in image.planes) {
       allBytes.putUint8List(plane.bytes);
@@ -233,7 +233,7 @@ class _CameraViewState extends State<CameraView> {
       planeData: planeData,
     );
     // debugPrint('====> Image Rotation: ${inputImageData.imageRotation}');
-    debugPrint('====> Panjang Byte ${bytes.length}');
+    // debugPrint('====> Panjang Byte ${bytes.length}');
 
     final inputImage =
         InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);

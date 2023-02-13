@@ -122,6 +122,9 @@ class MLKitService {
     var img1 = (camDir == CameraLensDirection.front)
         ? imglib.copyRotate(img, -90)
         : imglib.copyRotate(img, 90);
+
+    // flip horizontal agar tidak terbalik kanan kiri
+    img1 = imglib.flip(img1, imglib.Flip.horizontal);
     return img1;
   }
 

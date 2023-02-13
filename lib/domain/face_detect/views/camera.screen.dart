@@ -75,8 +75,7 @@ class _CameraScreenState extends State<CameraScreen> {
     throttler.run(() async {
       final faces = await _faceDetector.processImage(inputImage);
       debugPrint('====> wajah ${faces.length}');
-      debugPrint(
-          '====> imageData S: ${inputImage.inputImageData?.size} | R: ${inputImage.inputImageData?.imageRotation}');
+      // debugPrint('====> imageData S: ${inputImage.inputImageData?.size} | R: ${inputImage.inputImageData?.imageRotation}');
       if (inputImage.inputImageData?.size != null &&
           inputImage.inputImageData?.imageRotation != null) {
         final painter = FaceDetectorPainter(
