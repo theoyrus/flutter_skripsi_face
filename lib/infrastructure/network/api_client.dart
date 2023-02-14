@@ -13,15 +13,15 @@ import 'api_interceptor.dart';
 class ApiClient {
   final Dio _dio = Dio(BaseOptions(
     baseUrl: Env.baseUrl,
-    connectTimeout: 1000,
-    receiveTimeout: 1000,
+    connectTimeout: 2000,
+    receiveTimeout: 2000,
   ));
 
   final Dio http = Dio(BaseOptions(
     // custom interceptor
     baseUrl: Env.baseUrl,
-    connectTimeout: 1000,
-    receiveTimeout: 1000,
+    connectTimeout: 2000,
+    receiveTimeout: 2000,
   ));
   Dio get dio => _dio;
 
@@ -177,6 +177,23 @@ class ApiClient {
       }
     }
     return errData.message;
+  }
+
+  static getErrorPesan(DioError error) {
+    var pesan = getErrorString(error);
+    if (pesan.contains('current_password')) {
+      pesan = 'Kata sandi saat ini tidak sesuai.';
+    } else if (pesan.contains('email already exist')) {
+      pesan = 'Email sudah dipakai.';
+    } else if (pesan.contains('username already exist')) {
+      pesan = 'Username sudah dipakai.';
+    } else if (pesan.contains('may not be blank')) {
+      final RegExp kolomX = RegExp(r"{(.*?):");
+      final Match match = kolomX.firstMatch(pesan) as Match;
+      final String? kolom = match.group(1);
+      pesan = '$kolom Wajib diisi.';
+    }
+    return pesan;
   }
 
   static getErrorMap(DioError error) {
