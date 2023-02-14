@@ -8,6 +8,9 @@ class EndPoints {
   static const String login = '/auth/login';
   static const String jwtRefresh = '/auth/jwt/refresh';
   static const String jwtVerify = '/auth/jwt/verify';
+  static const String userMe = '/auth/users/me/';
+  static const String userChangeEmail = '/auth/users/set_email/';
+  static const String userChangePass = '/auth/users/set_password/';
 
   // Karyawan
   static const String karyawan = '/karyawan';

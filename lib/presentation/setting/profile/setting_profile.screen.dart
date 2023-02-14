@@ -1,13 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../domain/divisi/divisi.provider.dart';
-import '../../../utils/date_time.utils.dart';
 import 'controllers/setting_profile.controller.dart';
 
 class SettingProfileScreen extends GetView<SettingProfileController> {
@@ -18,10 +16,14 @@ class SettingProfileScreen extends GetView<SettingProfileController> {
     var initialValue = {
       'noinduk': kMe.noinduk,
       'nama': kMe.nama,
-      'divisi': kMe.divisi?.divisiId
+      'divisi': kMe.divisi?.divisiId,
+      'username': kMe.user?.username,
+      'new_email': kMe.user?.email,
+      'first_name': kMe.nama?.split(' ').first, // kMe.user?.firstName,
+      'last_name':
+          kMe.nama?.split(' ').skip(1).join(' '), // kMe.user?.lastName,
     };
     var genderOptions = ['Laki-Laki', 'Perempuan'];
-    void _onChanged(dynamic val) => debugPrint(val.toString());
 
     const allCountries = [
       'Guatemala',
@@ -67,7 +69,7 @@ class SettingProfileScreen extends GetView<SettingProfileController> {
             key: controller.fbKey,
             onChanged: () {
               controller.fbKey.currentState?.save();
-              debugPrint(controller.fbKey.currentState?.value.toString());
+              // debugPrint(controller.fbKey.currentState?.value.toString());
             },
             initialValue: initialValue,
             child: Column(
@@ -91,6 +93,15 @@ class SettingProfileScreen extends GetView<SettingProfileController> {
                   ),
                   validator: FormBuilderValidators.required(),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: (v) {
+                    if (v != null) {
+                      var cS = controller.fbKey.currentState;
+                      String? fName = v.split(' ').first;
+                      String? lName = v.split(' ').skip(1).join(' ');
+                      cS?.fields['first_name']?.didChange(fName);
+                      cS?.fields['last_name']?.didChange(lName);
+                    }
+                  },
                 ),
                 // const SizedBox(height: 20),
                 // FormBuilderDateTimePicker(
@@ -176,6 +187,117 @@ class SettingProfileScreen extends GetView<SettingProfileController> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                     );
                   },
+                ),
+
+                const SizedBox(height: 20),
+                const Center(
+                  child: Text(
+                    'Atur akun',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                FormBuilderTextField(
+                  name: 'username',
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    prefixIcon: Icon(Icons.verified_user_outlined),
+                  ),
+                  validator: FormBuilderValidators.match(r'^[A-Za-z0-9_-]+$',
+                      errorText:
+                          'Username hanya mengizinkan karakter (A-Z, a-z, 0-9, -, dan _)'),
+                  autovalidateMode: AutovalidateMode.always,
+                  keyboardType: TextInputType.name,
+                ),
+                const SizedBox(height: 20),
+                FormBuilderTextField(
+                  name: 'first_name',
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Depan',
+                    prefixIcon: Icon(Icons.person_outline_sharp),
+                  ),
+                  keyboardType: TextInputType.name,
+                ),
+                const SizedBox(height: 20),
+                FormBuilderTextField(
+                  name: 'last_name',
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Belakang',
+                    prefixIcon: Icon(Icons.person_outline_sharp),
+                  ),
+                  keyboardType: TextInputType.name,
+                ),
+                const SizedBox(height: 20),
+                FormBuilderSwitch(
+                  name: 'is_change_pass',
+                  initialValue: false,
+                  title: const Text('Ganti email & kata sandi?'),
+                  onChanged: (value) => controller.isChangePass.toggle(),
+                ),
+                Obx(
+                  () => Visibility(
+                    visible: controller.isChangePass.isTrue,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        FormBuilderTextField(
+                          name: 'new_email',
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(Icons.alternate_email_outlined),
+                          ),
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.email(),
+                            FormBuilderValidators.required()
+                          ]),
+                          autovalidateMode: AutovalidateMode.always,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
+                        FormBuilderTextField(
+                          obscureText: controller.hiddenPass.isTrue,
+                          name: 'current_password',
+                          decoration: InputDecoration(
+                            labelText: 'Kata sandi saat ini',
+                            prefixIcon: const Icon(Icons.password),
+                            suffixIcon: IconButton(
+                              onPressed: () => controller.hiddenPass.toggle(),
+                              icon: controller.hiddenPass.isTrue
+                                  ? const Icon(Icons.visibility_off)
+                                  : const Icon(Icons.visibility),
+                            ),
+                          ),
+                          keyboardType: TextInputType.visiblePassword,
+                          initialValue: '',
+                        ),
+                        const SizedBox(height: 20),
+                        FormBuilderTextField(
+                          obscureText: controller.hiddenNewPass.isTrue,
+                          name: 'new_password',
+                          decoration: InputDecoration(
+                            labelText: 'Kata sandi baru',
+                            prefixIcon: const Icon(Icons.password),
+                            suffixIcon: IconButton(
+                              onPressed: () =>
+                                  controller.hiddenNewPass.toggle(),
+                              icon: controller.hiddenNewPass.isTrue
+                                  ? const Icon(Icons.visibility_off)
+                                  : const Icon(Icons.visibility),
+                            ),
+                          ),
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.minLength(8,
+                                errorText: 'Minimal 8 karakter'),
+                          ]),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType: TextInputType.visiblePassword,
+                          initialValue: '',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
