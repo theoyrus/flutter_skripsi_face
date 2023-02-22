@@ -50,3 +50,91 @@ ThemeData themeDataDark() {
     colorScheme: appColorSchemeDark(),
   );
 }
+
+class AppTheme {
+  static final ThemeData lightTheme = ThemeData(
+    primaryColor: Colors.blue,
+    buttonTheme: ButtonThemeData(
+      textTheme: ButtonTextTheme.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    ),
+  );
+
+  static final ThemeData darkTheme = ThemeData(
+    primaryColor: Colors.deepPurple,
+    buttonTheme: ButtonThemeData(
+      textTheme: ButtonTextTheme.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    ),
+  );
+
+  static final ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.blue,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+
+  static final ButtonStyle secondaryButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.grey[300],
+    foregroundColor: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+
+  static final ButtonStyle successButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.green,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+
+  static final ButtonStyle warningButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.orange,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+
+  static final ButtonStyle defaultButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+
+  static final ButtonStyle dangerButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.red,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+  );
+}

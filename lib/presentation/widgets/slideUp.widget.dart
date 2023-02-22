@@ -11,12 +11,16 @@ class SlideUpWidget extends StatefulWidget {
   final List<Widget> panel;
   final PanelController? panelCtrl;
   final Widget? body;
+  final Widget? collapsed;
+  final double? minHeight;
 
   const SlideUpWidget({
     Key? key,
     required this.panel,
     this.panelCtrl,
     this.body,
+    this.collapsed,
+    this.minHeight,
   }) : super(key: key);
 
   @override
@@ -27,7 +31,7 @@ class _SlideUpWidgetState extends State<SlideUpWidget> {
   final double _initFabHeight = 120.0;
   double _fabHeight = 0;
   double _panelHeightOpen = 0;
-  double _panelHeightClosed = 95.0;
+  double _panelHeightClosed = 150.0;
 
   @override
   void initState() {
@@ -46,10 +50,11 @@ class _SlideUpWidgetState extends State<SlideUpWidget> {
         SlidingUpPanel(
           controller: widget.panelCtrl,
           maxHeight: _panelHeightOpen,
-          minHeight: _panelHeightClosed,
+          minHeight: widget.minHeight ?? _panelHeightClosed,
           parallaxEnabled: true,
           parallaxOffset: .5,
           body: _body(),
+          collapsed: _collapsed(),
           panelBuilder: (sc) => _panel(sc, null),
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
@@ -221,7 +226,7 @@ class _SlideUpWidgetState extends State<SlideUpWidget> {
         context: context,
         removeTop: true,
         child: Container(
-          color: Theme.of(context).backgroundColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           // decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
           child: ListView(
             controller: sc,
@@ -232,6 +237,12 @@ class _SlideUpWidgetState extends State<SlideUpWidget> {
 
   Widget? _body() {
     return widget.body;
+  }
+
+  Widget? _collapsed() {
+    if (widget.collapsed != null) {
+      return widget.collapsed;
+    }
   }
 }
 
