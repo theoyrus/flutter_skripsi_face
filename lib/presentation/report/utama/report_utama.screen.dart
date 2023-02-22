@@ -14,7 +14,8 @@ class ReportUtamaScreen extends GetView<ReportUtamaController> {
       ),
       body: const Center(
         child: Text(
-          'Report  is working',
+          'Please wait a moment, something cool is being processed. :)',
+          textAlign: TextAlign.center,
           style: TextStyle(fontSize: 20),
         ),
       ),

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../domain/karyawan/karyawan.provider.dart';
+import '../../domain/presensi/presensi.provider.dart';
+import '../../utils/date_time.utils.dart';
 import '../widgets/longText.widget.dart';
 import 'controllers/beranda.controller.dart';
 
@@ -19,6 +21,8 @@ class BerandaMobile extends StatelessWidget {
 
   Future<void> _refreshScreen(c) async {
     Get.find<KaryawanProvider>().meState();
+    Get.find<PresensiProvider>().presensiTodayState();
+    Get.find<PresensiProvider>().presensiBulanIniState();
     c.getJam();
   }
 
@@ -107,24 +111,40 @@ class BerandaMobile extends StatelessWidget {
                   height: 10,
                   width: context.width,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: const [
-                        Icon(MdiIcons.clockTimeEightOutline, size: 40),
-                        Text('Hadir Presensi'),
-                        Text('07:49'),
+                GetBuilder<PresensiProvider>(
+                  init: PresensiProvider(),
+                  builder: (_) {
+                    var kehadiran = _.kehadiranHariIni.value;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            const Icon(MdiIcons.clockTimeEightOutline,
+                                size: 40),
+                            Text(kehadiran.waktuHadir != null
+                                ? 'Hadir Presensi'
+                                : 'Belum Presensi'),
+                            Text(kehadiran.waktuHadir != null
+                                ? idTime(kehadiran.waktuHadir!, format: 'HH:mm')
+                                : ''),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Icon(MdiIcons.clockTimeFourOutline, size: 40),
+                            Text(kehadiran.waktuPulang != null
+                                ? 'Pulang Presensi'
+                                : 'Belum Presensi'),
+                            Text(kehadiran.waktuPulang != null
+                                ? idTime(kehadiran.waktuPulang!,
+                                    format: 'HH:mm')
+                                : ''),
+                          ],
+                        ),
                       ],
-                    ),
-                    Column(
-                      children: const [
-                        Icon(MdiIcons.clockTimeFourOutline, size: 40),
-                        Text('Belum Presensi'),
-                        Text(''),
-                      ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
                 const Center(
                   child: Text(
@@ -132,43 +152,55 @@ class BerandaMobile extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: const [
-                        Icon(
-                          MdiIcons.checkBold,
-                          size: 40,
-                          color: Colors.green,
+                GetBuilder<PresensiProvider>(
+                  init: PresensiProvider(),
+                  builder: (_) {
+                    var blnIni = _.kehadiranBulanIni.value;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            const Icon(
+                              MdiIcons.checkBold,
+                              size: 40,
+                              color: Colors.green,
+                            ),
+                            Text(blnIni.hadir != null
+                                ? blnIni.hadir.toString()
+                                : '0'),
+                            const Text('Kehadiran'),
+                          ],
                         ),
-                        Text('12'),
-                        Text('Kehadiran'),
-                      ],
-                    ),
-                    Column(
-                      children: const [
-                        Icon(
-                          MdiIcons.alert,
-                          size: 40,
-                          color: Colors.orange,
+                        Column(
+                          children: [
+                            const Icon(
+                              MdiIcons.alert,
+                              size: 40,
+                              color: Colors.orange,
+                            ),
+                            Text(blnIni.terlambat != null
+                                ? blnIni.terlambat.toString()
+                                : '0'),
+                            const Text('Terlambat'),
+                          ],
                         ),
-                        Text('12'),
-                        Text('Terlambat'),
-                      ],
-                    ),
-                    Column(
-                      children: const [
-                        Icon(
-                          Icons.dangerous_rounded,
-                          size: 40,
-                          color: Colors.red,
+                        Column(
+                          children: [
+                            const Icon(
+                              Icons.dangerous_rounded,
+                              size: 40,
+                              color: Colors.red,
+                            ),
+                            Text(blnIni.tidakHadir != null
+                                ? blnIni.tidakHadir.toString()
+                                : '0'),
+                            const Text('Tidak Hadir'),
+                          ],
                         ),
-                        Text('8'),
-                        Text('Tidak Hadir'),
                       ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ],
             ),
