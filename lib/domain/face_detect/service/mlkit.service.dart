@@ -128,6 +128,12 @@ class MLKitService {
     return img1;
   }
 
+  Future<dynamic> capture(CameraImage image) async {
+    imglib.Image capturedImage =
+        convertCameraImage(image, CameraLensDirection.front);
+    return capturedImage;
+  }
+
   Future<dynamic> cropWajah(CameraImage image, dynamic result) async {
     imglib.Image convertedImage =
         convertCameraImage(image, CameraLensDirection.front);

@@ -82,3 +82,15 @@ Future deleteImage(path) async {
   final file = File(imagePath);
   file.delete();
 }
+
+Future<void> clearCache() async {
+  Directory cacheDir = await getTemporaryDirectory();
+  if (cacheDir.existsSync()) {
+    cacheDir.listSync().forEach((file) {
+      if (file is File) {
+        debugPrint('deleting file $file');
+        file.deleteSync();
+      }
+    });
+  }
+}

@@ -10,7 +10,8 @@ import '../service/mlkit.service.dart';
 import 'camera.view.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key, this.onFaceDetected}) : super(key: key);
+  const CameraScreen({Key? key, this.onFaceDetected, this.onPauseText})
+      : super(key: key);
 
   /// Event ketika wajah ditemukan
   final void Function({
@@ -18,6 +19,7 @@ class CameraScreen extends StatefulWidget {
     CameraImage? cameraImage,
     String? statusProses,
   })? onFaceDetected;
+  final String? onPauseText;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -128,6 +130,7 @@ class _CameraScreenState extends State<CameraScreen> {
             processImage(inputImage, cameraImage);
           },
           statusProses: statusProses,
+          onPauseText: widget.onPauseText,
           initialDirection: CameraLensDirection.front,
         ),
       ],

@@ -4,6 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../../domain/citrawajah/citrawajah.service.dart';
 import '../../../../domain/face_detect/service/image.service.dart';
@@ -29,6 +30,8 @@ class CitrawajahTambahController extends GetxController {
   List<ImageItem> croppedImageItems = [];
   final _box = GetStorage();
 
+  final PanelController panelCtrl = PanelController();
+
   @override
   void onInit() async {
     maxImage = 10;
@@ -36,19 +39,23 @@ class CitrawajahTambahController extends GetxController {
     croppedImagesPath = [];
     croppedImageItems = [];
 
-    dialogInfo(
-      onOK: () {
-        cameraReady = true;
-        update();
-        print('aku diklik...');
-      },
-      title: 'Petunjuk',
-      body:
-          'Arahkan wajah anda pada kamera. Kamera dilengkapi fitur untuk memverifikasi keaslian wajah melalui teknologi liveness, '
-          'silahkan kedipkan mata anda untuk meng-capture citra wajah.'
-          '\n\nKetika cukup meng-capture, silahkan tekan tombol biru (Selesai), '
-          'lalu tombol hijau (Proses) untuk mengunggah citra.',
-    );
+    if (Get.parameters['ulang'] == null) {
+      dialogInfo(
+        onOK: () {
+          cameraReady = true;
+          update();
+        },
+        title: 'Petunjuk',
+        body:
+            'Arahkan wajah anda pada kamera. Kamera dilengkapi fitur untuk memverifikasi keaslian wajah melalui teknologi liveness, '
+            'silahkan kedipkan mata anda untuk meng-capture citra wajah.'
+            '\n\nKetika cukup meng-capture, silahkan tekan tombol biru (Selesai), '
+            'lalu tombol hijau (Proses) untuk mengunggah citra.',
+      );
+    } else {
+      cameraReady = true;
+      update();
+    }
 
     super.onInit();
   }
@@ -104,6 +111,9 @@ class CitrawajahTambahController extends GetxController {
   }
 
   void onDone() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      panelCtrl.isAttached ? panelCtrl.open() : null;
+    });
     _box.write('cameraProcess', 'ONDONE');
     update();
   }
@@ -164,10 +174,11 @@ class CitrawajahTambahController extends GetxController {
 
   ulangProses() {
     Get.back();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      Get.toNamed(Routes.CITRAWAJAH_TAMBAH);
+    SmartDialog.showLoading(msg: 'Tunggu sebentar ...');
+    Future.delayed(const Duration(seconds: 1), () {
+      Get.toNamed(Routes.CITRAWAJAH_TAMBAH, parameters: {'ulang': 'YA'});
       _box.write('cameraProcess', 'ONPROCESS');
+      SmartDialog.dismiss();
     });
-    // Get.offAndToNamed(Routes.CITRAWAJAH_TAMBAH);
   }
 }

@@ -5,7 +5,6 @@ import 'package:lottie/lottie.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../domain/face_detect/views/camera.screen.dart';
-import '../../../domain/face_detect/views/live_camera.widget.dart';
 import '../../widgets/gridView.widget.dart';
 import '../../widgets/slideUp.widget.dart';
 import 'controllers/citrawajah_tambah.controller.dart';
@@ -14,7 +13,6 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
   const CitrawajahTambahScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final PanelController panelCtrl = PanelController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Citra Wajah'),
@@ -33,12 +31,13 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
                         camImg: cameraImage,
                         statusProses: statusProses,
                       );
-                      if (statusProses == 'ONDONE') panelCtrl.open();
+                      if (statusProses == 'ONDONE') controller.panelCtrl.open();
                     },
                   ),
                   SlideUpWidget(
-                    panelCtrl: panelCtrl,
+                    panelCtrl: controller.panelCtrl,
                     panel: panelSlideUp(),
+                    minHeight: 175,
                   ),
                   // Load a Lottie file from your assets
                   Obx(

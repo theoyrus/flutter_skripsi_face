@@ -4,6 +4,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../infrastructure/navigation/routes.dart';
+import '../../../utils/pullrefresh.utils.dart';
 import '../../widgets/gridView.widget.dart';
 import '../../widgets/menu.widget.dart';
 import 'controllers/citrawajah_my.controller.dart';
@@ -36,13 +37,7 @@ class CitrawajahMyScreen extends GetView<CitrawajahMyController> {
               controller: controller.refreshCtrl,
               enablePullDown: true,
               enablePullUp: true,
-              header: const ClassicHeader(
-                refreshingText: 'Memuat ...',
-                releaseText: 'Lepas untuk me-refresh',
-                idleText: 'Tarik ke bawah untuk me-refresh',
-                completeText: 'Selesai',
-                failedText: 'Gagal :(',
-              ),
+              header: smartRefreshHeaderConfig,
               onRefresh: () => controller.refreshScreen(),
               onLoading: () => controller.loadMore(),
               child: Obx(
