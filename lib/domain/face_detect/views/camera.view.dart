@@ -13,6 +13,7 @@ class CameraView extends StatefulWidget {
     this.text,
     required this.onImage,
     this.statusProses,
+    this.onPauseText,
     this.onScreenModeChanged,
     this.initialDirection = CameraLensDirection.back,
   }) : super(key: key);
@@ -22,6 +23,7 @@ class CameraView extends StatefulWidget {
   final String? text;
   final Function(InputImage inputImage, CameraImage? cameraImage) onImage;
   final String? statusProses;
+  final String? onPauseText;
   final Function(ScreenMode mode)? onScreenModeChanged;
   final CameraLensDirection initialDirection;
 
@@ -133,6 +135,12 @@ class _CameraViewState extends State<CameraView> {
               style: TextStyle(color: Colors.green, fontSize: 30),
               textAlign: TextAlign.center,
             ),
+          if (_controller != null && widget.statusProses == 'ONPAUSE')
+            Text(
+              widget.onPauseText ?? 'Camera Paused',
+              style: const TextStyle(color: Colors.amber, fontSize: 30),
+              textAlign: TextAlign.center,
+            ),
           // Positioned(
           //   bottom: 100,
           //   left: 50,
@@ -185,6 +193,16 @@ class _CameraViewState extends State<CameraView> {
     await _controller?.dispose();
     _controller = null;
     setState(() => _controller = null);
+  }
+
+  Future _pauseLiveFeed() async {
+    await _controller?.pausePreview();
+  }
+
+  Future _resumeLiveFeed() async {
+    if (_controller != null) {
+      await _controller?.resumePreview();
+    }
   }
 
   Future _switchLiveCamera() async {
@@ -241,6 +259,14 @@ class _CameraViewState extends State<CameraView> {
     widget.onImage(inputImage, image);
     if (widget.statusProses == 'ONDONE') {
       _stopLiveFeed();
+    }
+
+    if (widget.statusProses == 'ONPAUSE') {
+      _pauseLiveFeed();
+    }
+
+    if (widget.statusProses == 'ONRESUME') {
+      _resumeLiveFeed();
     }
   }
 }

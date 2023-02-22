@@ -88,12 +88,14 @@ class ApiClient {
     String endpoint,
     dynamic data, {
     Map<String, dynamic>? headers,
+    bool disableRetry = false,
   }) async {
     try {
       Response response = await dio.post(
         Uri.encodeFull(endpoint),
         data: data,
-        options: Options(headers: headers ?? getHeaders()),
+        options: Options(headers: headers ?? getHeaders())
+          ..disableRetry = disableRetry,
       );
       return response;
     } catch (e) {
@@ -142,17 +144,22 @@ class ApiClient {
         ...getHeaders(),
         ...{'Content-Type': 'multipart/form-data'}
       },
+      disableRetry: false,
     );
   }
 
   addFiles(File file, String fieldName) async {
     String filename = file.path.split('/').last;
     final data = <String, MultipartFile>{
-      fieldName:
-          await MultipartFile.fromFile(file.uri.path, filename: filename),
+      fieldName: MultipartFileRecreatable.fromFileSync(file.uri.path,
+          filename: filename),
     };
     multipartData = {...multipartData, ...data};
     return multipartData;
+  }
+
+  clearFiles() {
+    multipartData = {};
   }
 
   static getErrorString(DioError error) {

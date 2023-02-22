@@ -24,8 +24,40 @@ String idDayName(DateTime dateTime) {
   return DateFormat('EEEE', 'id').format(dateTime);
 }
 
-String idTime(DateTime dateTime) {
-  return DateFormat('HH:mm:ss').format(dateTime);
+String idHariBulan(DateTime dateTime) {
+  initializeDateFormatting();
+  return DateFormat('d MMM', 'id').format(dateTime);
+}
+
+String idTime(DateTime dateTime, {format = 'HH:mm:ss', withTZ = false}) {
+  String strdatetime = dateTime.toString();
+  if (isValidDateTime(strdatetime)) {
+    return DateFormat(format).format(dateTime);
+  }
+  return '';
+}
+
+bool isValidDateTime(String dateTimeString) {
+  List<String> formats = [
+    'yyyy-MM-ddTHH:mm:ssZ',
+    'yyyy-MM-ddTHH:mm:ss',
+    'yyyy-MM-dd HH:mm:ss',
+    'HH:mm:ss',
+    'yyyy-MM-dd',
+  ];
+
+  for (String format in formats) {
+    try {
+      DateFormat dateFormat = DateFormat(format);
+      DateTime dateTime = dateFormat.parse(dateTimeString);
+      if (dateTime != null) {
+        return true;
+      }
+    } catch (e) {
+      continue;
+    }
+  }
+  return false;
 }
 
 String enFullDate(DateTime dateTime) {
@@ -56,4 +88,9 @@ Future<String> getWaktuString({String timezone = 'Asia/Jakarta'}) async {
 String fullDateTimeNoSpace(DateTime dateTime) {
   initializeDateFormatting();
   return DateFormat('yyyyMMdd_hhmmss_S').format(dateTime);
+}
+
+String getMonthNameByIdx(int idx, {String langCode = 'en'}) {
+  return DateFormat.MMMM(langCode)
+      .format(DateFormat('M').parse(idx.toString()));
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 
 import '../../config.dart';
@@ -84,6 +85,11 @@ class Nav {
       name: Routes.SPLASHSCREEN,
       page: () => const SplashscreenScreen(),
       binding: SplashscreenControllerBinding(),
+    ),
+    GetPage(
+      name: Routes.PRESENSI_REKAM,
+      page: () => const PresensiRekamScreen(),
+      binding: PresensiRekamControllerBinding(),
     ),
   ];
 }

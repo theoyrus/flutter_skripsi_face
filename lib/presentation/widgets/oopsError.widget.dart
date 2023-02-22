@@ -9,7 +9,7 @@ Widget oopsError(FlutterErrorDetails error) {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            Text("Emmh, tunggu sebentar ... "),
+            Text("Emmh, wait... "),
             Icon(MdiIcons.emoticonExcited),
           ],
         ),
