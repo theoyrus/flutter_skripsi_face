@@ -10,3 +10,4 @@ export './setting/general/setting_general.screen.dart';
 export './setting/profile/setting_profile.screen.dart';
 export './setting/tampilan/setting_tampilan.screen.dart';
 export './splashscreen/splashscreen.screen.dart';
+export './presensi/rekam/presensi_rekam.screen.dart';

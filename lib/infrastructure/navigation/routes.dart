@@ -16,4 +16,5 @@ class Routes {
   static const SETTING_PROFILE = '/setting-profile';
   static const SETTING_TAMPILAN = '/setting-tampilan';
   static const SPLASHSCREEN = '/splashscreen';
+  static const PRESENSI_REKAM = '/presensi-rekam';
 }

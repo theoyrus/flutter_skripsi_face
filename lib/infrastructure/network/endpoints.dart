@@ -24,4 +24,5 @@ class EndPoints {
 
   // Presensi
   static const String presensi = '/presensi';
+  static const String kehadiran = '/presensi/kehadiran';
 }
