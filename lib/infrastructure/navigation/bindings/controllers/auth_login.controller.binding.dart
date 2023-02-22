@@ -5,8 +5,6 @@ import '../../../../presentation/auth/login/controllers/auth_login.controller.da
 class AuthLoginControllerBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AuthLoginController>(
-      () => AuthLoginController(),
-    );
+    Get.lazyPut<AuthLoginController>(() => AuthLoginController(), fenix: true);
   }
 }
