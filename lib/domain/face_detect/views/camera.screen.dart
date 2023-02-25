@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 import '../../../presentation/widgets/gridView.widget.dart';
@@ -8,6 +8,14 @@ import '../painter/face_detect.painter.dart';
 import '../service/camera.service.dart';
 import '../service/mlkit.service.dart';
 import 'camera.view.dart';
+
+class CameraScreenController extends GetxController {
+  var cameraStatus = 'ONPROCESS'.obs;
+
+  void updateCameraStatus(String status) {
+    cameraStatus.value = status;
+  }
+}
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({Key? key, this.onFaceDetected, this.onPauseText})
@@ -44,16 +52,19 @@ class _CameraScreenState extends State<CameraScreen> {
   String statusProses = 'ONPROCESS';
 
   final MLKitService _mlKitService = MLKitService();
-  late Throttler throttler;
-  final _box = GetStorage();
+  final Throttler throttler = Throttler(milliSeconds: 300);
+  final CameraScreenController cameraScreenController =
+      Get.put(CameraScreenController());
+  // final _box = GetStorage();
 
   @override
   void initState() {
     super.initState();
-    throttler = Throttler(milliSeconds: 500);
+    // throttler = Throttler(milliSeconds: 400);
 
-    _box.write('cameraProcess', 'ONPROCESS');
-    statusProses = _box.read('cameraProcess') ?? 'ONPROCESS';
+    // _box.write('cameraProcess', 'ONPROCESS');
+    // statusProses = _box.read('cameraProcess') ?? 'ONPROCESS';
+    statusProses = cameraScreenController.cameraStatus.value;
   }
 
   @override
@@ -82,22 +93,26 @@ class _CameraScreenState extends State<CameraScreen> {
           inputImage.inputImageData?.imageRotation != null) {
         final painter = FaceDetectorPainter(
           faces,
-          inputImage.inputImageData!.size,
-          inputImage.inputImageData!.imageRotation,
+          // inputImage.inputImageData!.size,
+          // inputImage.inputImageData!.imageRotation,
+          inputImage.inputImageData?.size ?? const Size(0, 0),
+          inputImage.inputImageData?.imageRotation ??
+              InputImageRotation.rotation0deg,
         );
         _customPaint = CustomPaint(painter: painter);
         String text =
             faces.isNotEmpty ? 'Wajah terdeteksi' : 'Tidak Terdeteksi';
         _text = text;
 
+        // statusProses = _box.read('cameraProcess') ?? 'ONPROCESS';
+        statusProses = cameraScreenController.cameraStatus.value;
+        debugPrint('status proses => $statusProses');
         // eksekusi onFaceDetected
         widget.onFaceDetected?.call(
           faces: faces,
-          cameraImage: cameraImage!,
+          cameraImage: cameraImage,
           statusProses: statusProses,
         );
-        statusProses = _box.read('cameraProcess') ?? 'ONPROCESS';
-        debugPrint('status proses => from storage => $statusProses');
       } else {
         String text = 'Faces found: ${faces.length}\n\n';
         for (final face in faces) {

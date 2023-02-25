@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:location/location.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -11,8 +10,8 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../domain/citrawajah/citrawajah.service.dart';
 import '../../../../domain/face_detect/service/image.service.dart';
 import '../../../../domain/face_detect/service/mlkit.service.dart';
+import '../../../../domain/face_detect/views/camera.screen.dart';
 import '../../../../domain/presensi/presensi.service.dart';
-import '../../../../infrastructure/navigation/routes.dart';
 import '../../../../utils/dialog.utils.dart';
 import '../../../../utils/snackbar.utils.dart';
 import '../../../widgets/gridView.widget.dart';
@@ -22,16 +21,19 @@ class PresensiRekamController extends GetxController {
   final CitraWajahService _citraWajahService = CitraWajahService();
   final PresensiService _presensiService = PresensiService();
   final PanelController panelCtrl = PanelController();
+  final CameraScreenController cameraScreenController =
+      Get.put(CameraScreenController());
 
   int countImage = 0;
   int mataTertutup = 0;
   double kedipProb = 0.3;
   bool streamDone = false;
   bool cameraReady = false;
+  bool isUlang = false;
   final faceCaptured = false.obs;
   bool isImageCaptured = false;
   final faceRecognized = false.obs;
-  final _box = GetStorage();
+  // final _box = GetStorage();
   List<String> croppedImagesPath = [];
   List<ImageItem> croppedImageItems = [];
   String jenis = '';
@@ -44,7 +46,9 @@ class PresensiRekamController extends GetxController {
     jenis = Get.parameters['jenis']!;
     countImage = 0;
     isImageCaptured = false;
-    if (Get.parameters['ulang'] == null) {
+    streamDone = false;
+
+    if (!isUlang) {
       dialogInfo(
         onOK: () {
           cameraReady = true;
@@ -80,7 +84,7 @@ class PresensiRekamController extends GetxController {
           if (mataTertutup != 0 && mataTertutup <= 3) {
             debugPrint('====> MATA TERBUKA KEMBALI, $mataTertutup kedipan');
             faceCaptured.value = true;
-            await Future.delayed(const Duration(milliseconds: 100));
+            // await Future.delayed(const Duration(milliseconds: 100));
 
             onPause();
             if (!isImageCaptured) {
@@ -120,7 +124,7 @@ class PresensiRekamController extends GetxController {
 
       statusProses = 'ONPROCESS';
     } else if (streamDone) {
-      statusProses = 'ONDONE';
+      // statusProses = 'ONDONE';
       onDone();
     }
   }
@@ -153,12 +157,14 @@ class PresensiRekamController extends GetxController {
   }
 
   void onDone() {
-    _box.write('cameraProcess', 'ONDONE');
+    // _box.write('cameraProcess', 'ONDONE');
+    cameraScreenController.updateCameraStatus('ONDONE');
     update();
   }
 
   void onPause() {
-    _box.write('cameraProcess', 'ONPAUSE');
+    // _box.write('cameraProcess', 'ONPAUSE');
+    cameraScreenController.updateCameraStatus('ONPAUSE');
     update();
     Future.delayed(const Duration(milliseconds: 500), () {
       panelCtrl.isAttached ? panelCtrl.open() : null;
@@ -166,12 +172,17 @@ class PresensiRekamController extends GetxController {
   }
 
   ulangProses() {
-    Get.close(1);
-    Get.back();
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.toNamed(Routes.PRESENSI_REKAM,
-          parameters: {'jenis': jenis, 'ulang': 'YA'});
-      _box.write('cameraProcess', 'ONPROCESS');
+    SmartDialog.showLoading(msg: 'Tunggu sebentar ...');
+    panelCtrl.isAttached ? panelCtrl.hide() : null;
+    cameraReady = false;
+    isUlang = true;
+    update();
+    Future.delayed(const Duration(milliseconds: 250), () {
+      onInit();
+      cameraScreenController.updateCameraStatus('ONPROCESS');
+      streamDone = false;
+      update();
+      SmartDialog.dismiss();
     });
   }
 

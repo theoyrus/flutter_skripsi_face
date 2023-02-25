@@ -2,14 +2,13 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../../domain/citrawajah/citrawajah.service.dart';
 import '../../../../domain/face_detect/service/image.service.dart';
 import '../../../../domain/face_detect/service/mlkit.service.dart';
-import '../../../../infrastructure/navigation/routes.dart';
+import '../../../../domain/face_detect/views/camera.screen.dart';
 import '../../../../utils/dialog.utils.dart';
 import '../../../../utils/snackbar.utils.dart';
 import '../../../widgets/gridView.widget.dart';
@@ -21,6 +20,7 @@ class CitrawajahTambahController extends GetxController {
   double kedipProb = 0.3;
   bool streamDone = false;
   bool cameraReady = false;
+  bool isUlang = false;
   final faceCaptured = false.obs;
 
   final MLKitService _mlKitService = MLKitService();
@@ -28,9 +28,11 @@ class CitrawajahTambahController extends GetxController {
 
   List<String> croppedImagesPath = [];
   List<ImageItem> croppedImageItems = [];
-  final _box = GetStorage();
+  // final _box = GetStorage();
 
   final PanelController panelCtrl = PanelController();
+  final CameraScreenController cameraScreenController =
+      Get.put(CameraScreenController());
 
   @override
   void onInit() async {
@@ -38,8 +40,9 @@ class CitrawajahTambahController extends GetxController {
     countImage = 0;
     croppedImagesPath = [];
     croppedImageItems = [];
+    streamDone = false;
 
-    if (Get.parameters['ulang'] == null) {
+    if (!isUlang) {
       dialogInfo(
         onOK: () {
           cameraReady = true;
@@ -87,7 +90,7 @@ class CitrawajahTambahController extends GetxController {
           if (mataTertutup != 0 && mataTertutup <= 3) {
             debugPrint('====> MATA TERBUKA KEMBALI, $mataTertutup kedipan');
             faceCaptured.value = true;
-            await Future.delayed(const Duration(milliseconds: 100));
+            // await Future.delayed(const Duration(milliseconds: 100));
             // simpan temporary
             var path = await saveImage(cropppedImage);
             croppedImagesPath.add(path);
@@ -105,7 +108,7 @@ class CitrawajahTambahController extends GetxController {
       }
       statusProses = 'ONPROCESS';
     } else if (countImage == maxImage || streamDone) {
-      statusProses = 'ONDONE';
+      // statusProses = 'ONDONE';
       onDone();
     }
   }
@@ -114,14 +117,15 @@ class CitrawajahTambahController extends GetxController {
     Future.delayed(const Duration(milliseconds: 500), () {
       panelCtrl.isAttached ? panelCtrl.open() : null;
     });
-    _box.write('cameraProcess', 'ONDONE');
+    // _box.write('cameraProcess', 'ONDONE');
+    cameraScreenController.updateCameraStatus('ONDONE');
     update();
   }
 
   void streamFinish() {
     streamDone = true;
     update();
-    debugPrint('aku di klik');
+    // debugPrint('aku di klik');
   }
 
   tambahCitra() async {
@@ -173,12 +177,28 @@ class CitrawajahTambahController extends GetxController {
   }
 
   ulangProses() {
-    Get.back();
+    clearCache();
     SmartDialog.showLoading(msg: 'Tunggu sebentar ...');
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.toNamed(Routes.CITRAWAJAH_TAMBAH, parameters: {'ulang': 'YA'});
-      _box.write('cameraProcess', 'ONPROCESS');
+    panelCtrl.isAttached ? panelCtrl.hide() : null;
+    cameraReady = false;
+    isUlang = true;
+    update();
+    Future.delayed(const Duration(milliseconds: 250), () {
+      onInit();
+      cameraScreenController.updateCameraStatus('ONPROCESS');
+      streamDone = false;
+      update();
       SmartDialog.dismiss();
     });
+
+    return;
+    // Get.back();
+    // SmartDialog.showLoading(msg: 'Tunggu sebentar ...');
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   Get.toNamed(Routes.CITRAWAJAH_TAMBAH, parameters: {'ulang': 'YA'});
+    //   // _box.write('cameraProcess', 'ONPROCESS');
+    //   cameraScreenController.updateCameraStatus('ONPROCESS');
+    //   SmartDialog.dismiss();
+    // });
   }
 }
