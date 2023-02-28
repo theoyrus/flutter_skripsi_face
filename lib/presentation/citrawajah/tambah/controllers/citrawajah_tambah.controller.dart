@@ -1,13 +1,17 @@
 import 'package:camera/camera.dart';
+import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../../domain/citrawajah/citrawajah.service.dart';
+import '../../../../domain/face_detect/camerawesome/camerapage.screen.dart';
+import '../../../../domain/face_detect/camerawesome/services/jobs.queue.dart';
 import '../../../../domain/face_detect/service/image.service.dart';
-import '../../../../domain/face_detect/service/mlkit.service.dart';
+import '../../../../domain/face_detect/service/jobs.queue.dart';
 import '../../../../domain/face_detect/views/camera.screen.dart';
 import '../../../../utils/dialog.utils.dart';
 import '../../../../utils/snackbar.utils.dart';
@@ -22,25 +26,31 @@ class CitrawajahTambahController extends GetxController {
   bool cameraReady = false;
   bool isUlang = false;
   final faceCaptured = false.obs;
+  final pathCaptured = ''.obs;
+  final cameraPlugin = 'CamerAwesome'.obs;
 
-  final MLKitService _mlKitService = MLKitService();
-  final CitraWajahService _citraWajahService = CitraWajahService();
-
+  List<String> capturedImagesPath = [];
   List<String> croppedImagesPath = [];
   List<ImageItem> croppedImageItems = [];
-  // final _box = GetStorage();
+  final _box = GetStorage();
 
+  final CitraWajahService _citraWajahService = CitraWajahService();
   final PanelController panelCtrl = PanelController();
   final CameraScreenController cameraScreenController =
       Get.put(CameraScreenController());
+  final CameraPageController cameraPageController =
+      Get.put(CameraPageController());
 
   @override
   void onInit() async {
     maxImage = 10;
     countImage = 0;
+    capturedImagesPath = [];
     croppedImagesPath = [];
     croppedImageItems = [];
     streamDone = false;
+
+    cameraPlugin.value = _box.read('cameraPlugin') ?? cameraPlugin.value;
 
     if (!isUlang) {
       dialogInfo(
@@ -79,26 +89,27 @@ class CitrawajahTambahController extends GetxController {
     String? statusProses,
   }) async {
     if (countImage < maxImage && !streamDone) {
-      // imglib.Image cropppedImage =
-      var cropppedImage = await _mlKitService.cropWajah(camImg!, faces);
-      if (cropppedImage != null) {
-        final leftEyeOpenProb = faces?[0].leftEyeOpenProbability ?? 0;
-        final rightEyeOpenProb = faces?[0].rightEyeOpenProbability ?? 0;
+      if (faces != null) {
+        final leftEyeOpenProb = faces[0].leftEyeOpenProbability ?? 0;
+        final rightEyeOpenProb = faces[0].rightEyeOpenProbability ?? 0;
         if (leftEyeOpenProb > kedipProb && rightEyeOpenProb > kedipProb) {
           // eyes are open
           debugPrint('====> MATA TERBUKA');
           if (mataTertutup != 0 && mataTertutup <= 3) {
             debugPrint('====> MATA TERBUKA KEMBALI, $mataTertutup kedipan');
             faceCaptured.value = true;
-            // await Future.delayed(const Duration(milliseconds: 100));
             // simpan temporary
-            var path = await saveImage(cropppedImage);
-            croppedImagesPath.add(path);
-            croppedImageItems.add(ImageItem(path, 'citra ${countImage + 1}'));
-            countImage++;
-            debugPrint('====> Path $countImage : $path');
+            cropFaceJob(camImg!, faces).then((cropppedImage) {
+              saveImage(cropppedImage).then((path) {
+                croppedImagesPath.add(path);
+                croppedImageItems
+                    .add(ImageItem(path, 'citra ${countImage + 1}'));
+                countImage++;
+                debugPrint('====> Path $countImage : $path');
+                faceCaptured.value = false;
+              });
+            });
             mataTertutup = 0;
-            faceCaptured.value = false;
           }
         } else {
           // eyes are closed
@@ -108,24 +119,98 @@ class CitrawajahTambahController extends GetxController {
       }
       statusProses = 'ONPROCESS';
     } else if (countImage == maxImage || streamDone) {
-      // statusProses = 'ONDONE';
       onDone();
     }
   }
 
+  void onWajahDetected({
+    List<Face>? faces,
+    AnalysisImage? inputImage,
+    String? statusProses,
+  }) async {
+    if (countImage < maxImage && !streamDone) {
+      final leftEyeOpenProb = faces?[0].leftEyeOpenProbability ?? 0;
+      final rightEyeOpenProb = faces?[0].rightEyeOpenProbability ?? 0;
+      if (leftEyeOpenProb > kedipProb && rightEyeOpenProb > kedipProb) {
+        // eyes are open
+        debugPrint('====> MATA TERBUKA');
+        if (mataTertutup != 0 && mataTertutup <= 3) {
+          debugPrint('====> MATA TERBUKA KEMBALI, $mataTertutup kedipan');
+          faceCaptured.value = true;
+          // simpan temporary
+          doCapture(countImage);
+          Future.delayed(const Duration(milliseconds: 250), () {
+            mataTertutup = 0;
+            faceCaptured.value = false;
+          });
+          // }
+        }
+      } else {
+        // eyes are closed
+        mataTertutup++;
+        debugPrint('====> MATA TERTUTUP');
+      }
+      statusProses = 'ONPROCESS';
+    } else if (countImage == maxImage || streamDone) {
+      onDone();
+    }
+  }
+
+  void onCapture(String savedPath, int current) async {
+    pathCaptured.value = savedPath;
+    capturedImagesPath.add(savedPath);
+    update();
+  }
+
+  void cropAll() async {
+    SmartDialog.showLoading(msg: 'Meng-optimasi citra ...');
+    debugPrint('====> captured paths: $capturedImagesPath');
+    try {
+      int idx = 0;
+      await Future.forEach(capturedImagesPath, (String path) async {
+        try {
+          await cropFaceFileJob(path).then((croppedPath) {
+            croppedImagesPath.add(croppedPath);
+            croppedImageItems.add(ImageItem(croppedPath, 'citra ${idx + 1}'));
+
+            debugPrint('====> cropped to : $croppedPath');
+            idx++;
+            update();
+          });
+        } catch (e) {
+          debugPrint('====> cropping fail : $e');
+        }
+      });
+      SmartDialog.dismiss();
+    } catch (e) {
+      debugPrint('====> all fail : $e');
+      rethrow;
+    }
+  }
+
+  void doCapture(int counter) {
+    cameraPageController.updateCameraStatus('ONCAPTURE');
+    countImage++;
+    update();
+  }
+
   void onDone() {
+    faceCaptured.value = false;
     Future.delayed(const Duration(milliseconds: 500), () {
       panelCtrl.isAttached ? panelCtrl.open() : null;
     });
-    // _box.write('cameraProcess', 'ONDONE');
     cameraScreenController.updateCameraStatus('ONDONE');
+    cameraPageController.updateCameraStatus('ONDONE');
     update();
   }
 
   void streamFinish() {
     streamDone = true;
     update();
-    // debugPrint('aku di klik');
+    Future.delayed(const Duration(seconds: 1), () {
+      debugPrint('====> cropping harus jalan');
+      cropAll();
+    });
   }
 
   tambahCitra() async {
@@ -186,19 +271,18 @@ class CitrawajahTambahController extends GetxController {
     Future.delayed(const Duration(milliseconds: 250), () {
       onInit();
       cameraScreenController.updateCameraStatus('ONPROCESS');
+      cameraPageController.updateCameraStatus('ONPROCESS');
       streamDone = false;
       update();
       SmartDialog.dismiss();
     });
+  }
 
-    return;
-    // Get.back();
-    // SmartDialog.showLoading(msg: 'Tunggu sebentar ...');
-    // Future.delayed(const Duration(seconds: 1), () {
-    //   Get.toNamed(Routes.CITRAWAJAH_TAMBAH, parameters: {'ulang': 'YA'});
-    //   // _box.write('cameraProcess', 'ONPROCESS');
-    //   cameraScreenController.updateCameraStatus('ONPROCESS');
-    //   SmartDialog.dismiss();
-    // });
+  void switchCamera() {
+    cameraPlugin.value =
+        cameraPlugin.value == 'CamerAwesome' ? 'Camera' : 'CamerAwesome';
+
+    _box.write('cameraPlugin', cameraPlugin.value);
+    update();
   }
 }

@@ -119,7 +119,8 @@ class _CameraViewState extends State<CameraView> {
         children: <Widget>[
           // camera preview
           // if (_controller != null && _controller!.value.isInitialized)
-          if (_controller?.value.isInitialized ?? false)
+          if (_controller != null &&
+              (_controller?.value.isInitialized ?? false))
             CameraPreview(_controller!),
           // face painter
           if (_controller != null && widget.customPaint != null)

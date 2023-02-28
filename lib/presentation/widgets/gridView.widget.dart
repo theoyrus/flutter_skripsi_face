@@ -147,7 +147,7 @@ class ImageCardWidget extends StatelessWidget {
   Image ImageLocal() {
     return Image.file(
       File(item.image),
-      fit: BoxFit.cover,
+      fit: BoxFit.scaleDown,
     );
   }
 

@@ -85,10 +85,22 @@ Future deleteImage(path) async {
 
 Future<void> clearCache() async {
   Directory cacheDir = await getTemporaryDirectory();
+  String citraDirPath = '${cacheDir.path}/citra/';
+  Directory citraDir = Directory(citraDirPath);
+
   if (cacheDir.existsSync()) {
     cacheDir.listSync().forEach((file) {
       if (file is File) {
-        debugPrint('deleting file $file');
+        debugPrint('====> deleting cropped file $file');
+        file.deleteSync();
+      }
+    });
+  }
+
+  if (citraDir.existsSync()) {
+    citraDir.listSync().forEach((file) {
+      if (file is File) {
+        debugPrint('====> deleting original file $file');
         file.deleteSync();
       }
     });

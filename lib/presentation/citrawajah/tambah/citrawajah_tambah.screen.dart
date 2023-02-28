@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../domain/face_detect/camerawesome/camerapage.screen.dart';
 import '../../../domain/face_detect/views/camera.screen.dart';
 import '../../widgets/gridView.widget.dart';
+import '../../widgets/imageShow.widget.dart';
 import '../../widgets/slideUp.widget.dart';
 import 'controllers/citrawajah_tambah.controller.dart';
 
@@ -17,36 +19,60 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
       appBar: AppBar(
         title: const Text('Tambah Citra Wajah'),
         centerTitle: true,
+        actions: [
+          ElevatedButton(
+              onPressed: () => controller.switchCamera(),
+              child: const Icon(Icons.switch_camera_outlined)),
+        ],
       ),
       body: GetBuilder<CitrawajahTambahController>(
         init: CitrawajahTambahController(),
         initState: (_) {},
         builder: (_) {
           return controller.cameraReady
-              ? Stack(children: [
-                  CameraScreen(
-                    onFaceDetected: ({cameraImage, faces, statusProses}) {
-                      controller.onFaceDetected(
-                        faces: faces,
-                        camImg: cameraImage,
-                        statusProses: statusProses,
-                      );
-                      if (statusProses == 'ONDONE') controller.panelCtrl.open();
-                    },
-                  ),
-                  SlideUpWidget(
-                    panelCtrl: controller.panelCtrl,
-                    panel: panelSlideUp(),
-                    minHeight: 175,
-                  ),
-                  // Load a Lottie file from your assets
-                  Obx(
-                    () => Visibility(
-                      visible: controller.faceCaptured.isTrue,
-                      child: Lottie.asset('assets/lotties/face-ok.json'),
+              ? Stack(
+                  children: [
+                    // package camera
+                    if (controller.cameraPlugin.value == 'Camera')
+                      CameraScreen(
+                        onFaceDetected: ({cameraImage, faces, statusProses}) {
+                          controller.onFaceDetected(
+                            faces: faces,
+                            camImg: cameraImage,
+                            statusProses: statusProses,
+                          );
+                          if (statusProses == 'ONDONE')
+                            controller.panelCtrl.open();
+                        },
+                      ),
+                    // package camerawesome
+                    if (controller.cameraPlugin.value == 'CamerAwesome')
+                      CameraPage(
+                        onFaceDetected: ({inputImage, faces, statusProses}) {
+                          controller.onWajahDetected(
+                            faces: faces,
+                            inputImage: inputImage,
+                            statusProses: statusProses,
+                          );
+                        },
+                        onCapture: (({savedPath = '', current = 0}) {
+                          controller.onCapture(savedPath, current);
+                        }),
+                      ),
+                    SlideUpWidget(
+                      panelCtrl: controller.panelCtrl,
+                      panel: panelSlideUp(),
+                      minHeight: 175,
                     ),
-                  ),
-                ])
+                    // Load a Lottie file from your assets
+                    Obx(
+                      () => Visibility(
+                        visible: controller.faceCaptured.isTrue,
+                        child: Lottie.asset('assets/lotties/face-ok.json'),
+                      ),
+                    ),
+                  ],
+                )
               : const Center(
                   child: CircularProgressIndicator(),
                 );
@@ -133,6 +159,11 @@ class CitrawajahTambahScreen extends GetView<CitrawajahTambahController> {
           children: [
             GridViewWidget(
               items: controller.croppedImageItems,
+              onTap: (id) {
+                var pou = controller.croppedImageItems[id].image;
+                debugPrint('====> idnya $id $pou');
+                Get.dialog(ImageShowWidget(pathOrUrl: pou));
+              },
               onDoubleTap: (id) {
                 debugPrint('idnya $id');
                 controller.hapusCitra(id);

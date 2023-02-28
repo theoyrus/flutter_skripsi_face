@@ -107,18 +107,20 @@ class _CameraScreenState extends State<CameraScreen> {
         // statusProses = _box.read('cameraProcess') ?? 'ONPROCESS';
         statusProses = cameraScreenController.cameraStatus.value;
         debugPrint('status proses => $statusProses');
-        // eksekusi onFaceDetected
-        widget.onFaceDetected?.call(
-          faces: faces,
-          cameraImage: cameraImage,
-          statusProses: statusProses,
-        );
-      } else {
-        String text = 'Faces found: ${faces.length}\n\n';
-        for (final face in faces) {
-          text += 'face: ${face.boundingBox}\n\n';
+        if (faces.isNotEmpty) {
+          // eksekusi onFaceDetected
+          widget.onFaceDetected?.call(
+            faces: faces,
+            cameraImage: cameraImage,
+            statusProses: statusProses,
+          );
         }
-        _text = text;
+      } else {
+        // String text = 'Faces found: ${faces.length}\n\n';
+        // for (final face in faces) {
+        //   text += 'face: ${face.boundingBox}\n\n';
+        // }
+        // _text = text;
         _customPaint = null;
       }
     }); // end throttler
@@ -140,7 +142,7 @@ class _CameraScreenState extends State<CameraScreen> {
         CameraView(
           title: 'Face Detector',
           customPaint: _customPaint,
-          text: _text,
+          // text: _text,
           onImage: (inputImage, cameraImage) {
             processImage(inputImage, cameraImage);
           },

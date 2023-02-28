@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../../env/env.dart';
@@ -18,10 +21,23 @@ class SentryService with SentryFlutter {
     );
   }
 
+  static FutureOr<SentryEvent?> beforeSend(SentryEvent event,
+      {dynamic hint}) async {
+    if (event.throwable is DioError) {
+      event = event.copyWith(fingerprint: ['dio-http-error']);
+    }
+    if (event.culprit == '_startLiveFeed()') {
+      print('skipped _startLiveFeed() error');
+      return null;
+    }
+    return event;
+  }
+
   static Future<void> setup(AppRunner appRunner) async {
     await SentryFlutter.init((options) {
       options.dsn = dsn;
       options.attachScreenshot = true;
+      options.beforeSend = beforeSend;
     }, appRunner: appRunner);
   }
 
