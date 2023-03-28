@@ -106,7 +106,8 @@ class _CameraViewState extends State<CameraView> {
     // because camera preview size is received as landscape
     // but we're calculating for portrait orientation
     var scale = size.aspectRatio *
-        (_controller != null ? _controller!.value.aspectRatio : 1);
+        // (_controller != null ? _controller!.value.aspectRatio : 1);
+        (_controller?.value.aspectRatio ?? 1.0);
 
     // to prevent scaling down, invert the value
     if (scale < 1) scale = 1 / scale;
@@ -117,7 +118,9 @@ class _CameraViewState extends State<CameraView> {
         fit: StackFit.expand,
         children: <Widget>[
           // camera preview
-          if (_controller != null && _controller!.value.isInitialized)
+          // if (_controller != null && _controller!.value.isInitialized)
+          if (_controller != null &&
+              (_controller?.value.isInitialized ?? false))
             CameraPreview(_controller!),
           // face painter
           if (_controller != null && widget.customPaint != null)

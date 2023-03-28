@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart' as lottie;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../../domain/face_detect/camerawesome/camerapage.screen.dart';
 import '../../../domain/face_detect/views/camera.screen.dart';
 import '../../../domain/time/time.provider.dart';
 import '../../../infrastructure/theme/app_colors.dart';
+import '../../widgets/imageShow.widget.dart';
 import '../../widgets/slideUp.widget.dart';
 import 'controllers/presensi_rekam.controller.dart';
 
@@ -20,6 +22,11 @@ class PresensiRekamScreen extends GetView<PresensiRekamController> {
       appBar: AppBar(
         title: const Text('Rekam Presensi'),
         centerTitle: true,
+        actions: [
+          ElevatedButton(
+              onPressed: () => controller.switchCamera(),
+              child: const Icon(Icons.switch_camera_outlined)),
+        ],
       ),
       body: GetBuilder<PresensiRekamController>(
         init: PresensiRekamController(),
@@ -27,17 +34,33 @@ class PresensiRekamScreen extends GetView<PresensiRekamController> {
         builder: (_) {
           return controller.cameraReady
               ? Stack(children: [
-                  CameraScreen(
-                    onPauseText: '...',
-                    onFaceDetected: ({cameraImage, faces, statusProses}) {
-                      controller.onFaceDetected(
-                        faces: faces,
-                        camImg: cameraImage,
-                        statusProses: statusProses,
-                      );
-                      // if (statusProses == 'ONDONE') controller.panelCtrl.open();
-                    },
-                  ),
+                  // package camera
+                  if (controller.cameraPlugin.value == 'Camera')
+                    CameraScreen(
+                      onPauseText: '...',
+                      onFaceDetected: ({cameraImage, faces, statusProses}) {
+                        controller.onFaceDetected(
+                          faces: faces,
+                          camImg: cameraImage,
+                          statusProses: statusProses,
+                        );
+                        // if (statusProses == 'ONDONE') controller.panelCtrl.open();
+                      },
+                    ),
+
+                  // package camerawesome
+                  if (controller.cameraPlugin.value == 'CamerAwesome')
+                    CameraPage(
+                      onFaceDetected: ({faces, statusProses}) {
+                        controller.onWajahDetected(
+                          faces: faces,
+                          statusProses: statusProses,
+                        );
+                      },
+                      onCapture: (({savedPath = '', current = 0}) {
+                        controller.onCapture(savedPath, current);
+                      }),
+                    ),
                   SlideUpWidget(
                     panelCtrl: controller.panelCtrl,
                     panel: panelSlideUp(),
@@ -79,18 +102,26 @@ class PresensiRekamScreen extends GetView<PresensiRekamController> {
       const SizedBox(
         height: 15,
       ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text(
-            "Rekam Presensi\nPengenalan Wajah",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.normal,
-              fontSize: 24.0,
+      InkWell(
+        onDoubleTap: () {
+          if (controller.croppedImageItems.isNotEmpty) {
+            Get.dialog(ImageShowWidget(
+                pathOrUrl: controller.croppedImageItems.first.image));
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "Rekam Presensi\nPengenalan Wajah",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 24.0,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       const SizedBox(
         height: 10.0,

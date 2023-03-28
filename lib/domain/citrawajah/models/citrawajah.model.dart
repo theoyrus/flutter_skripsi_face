@@ -22,7 +22,7 @@ class CitraWajah {
 
   String? url;
   int? citrawajahId;
-  String? karyawan;
+  dynamic? karyawan;
   String? nama;
   DateTime? created;
   DateTime? updated;

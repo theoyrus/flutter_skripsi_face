@@ -13,6 +13,7 @@ class PresensiUtamaController extends GetxController {
   var isBisaClockOut = true.obs;
 
   final filterEnabled = false.obs;
+  final isHariIniLihat = false;
   final kehadiranItems = <Kehadiran>[].obs;
 
   @override

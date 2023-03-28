@@ -13,15 +13,15 @@ import 'api_interceptor.dart';
 class ApiClient {
   final Dio _dio = Dio(BaseOptions(
     baseUrl: Env.baseUrl,
-    connectTimeout: 2000,
-    receiveTimeout: 2000,
+    connectTimeout: 5000,
+    receiveTimeout: 3000,
   ));
 
   final Dio http = Dio(BaseOptions(
     // custom interceptor
     baseUrl: Env.baseUrl,
-    connectTimeout: 2000,
-    receiveTimeout: 2000,
+    connectTimeout: 5000,
+    receiveTimeout: 3000,
   ));
   Dio get dio => _dio;
 
@@ -144,7 +144,7 @@ class ApiClient {
         ...getHeaders(),
         ...{'Content-Type': 'multipart/form-data'}
       },
-      disableRetry: false,
+      disableRetry: true,
     );
   }
 

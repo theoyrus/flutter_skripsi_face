@@ -29,148 +29,144 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
         header: smartRefreshHeaderConfig,
         child: ListView(
           children: [
-            Center(
-              child: GetBuilder<TimeProvider>(
-                init: TimeProvider(),
-                builder: (_) {
-                  return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(_.hari.value,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 20)),
-                        Visibility(
-                            visible:
-                                _.waktu.value == 'Gagal mengambil waktu server',
-                            child: InkWell(
-                                onTap: () => _.getJam(),
-                                child: const Icon(Icons.refresh)))
-                      ]);
-                },
-              ),
-            ),
-            Row(
-              children: const [],
-            ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.44,
-                    child: Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
+            if (controller.isHariIniLihat)
+              Center(
+                child: GetBuilder<TimeProvider>(
+                  init: TimeProvider(),
+                  builder: (_) {
+                    return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Clock-In'),
-                          const Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
-                            child: Text(''),
-                          ),
-                          Container(
-                            width: 80,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(77, 70, 210, 57),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(MdiIcons.clockIn, size: 24),
-                                GetBuilder<PresensiProvider>(
-                                  init: PresensiProvider(),
-                                  builder: (_) {
-                                    var hariini = _.kehadiranHariIni.value;
-                                    return Text(hariini.waktuHadir != null
-                                        ? idTime(hariini.waktuHadir!,
-                                            format: 'HH:mm')
-                                        : '');
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).asGlass(
-                    clipBorderRadius: BorderRadius.circular(8),
-                    blurX: 10,
-                    blurY: 10,
-                    frosted: true,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Clock-Out'),
-                          const Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
-                            child: Text(''),
-                          ),
-                          Container(
-                            width: 80,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: const Color(0x9AF06A6A),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(MdiIcons.clockOut, size: 24),
-                                GetBuilder<PresensiProvider>(
-                                  builder: (_) {
-                                    var hariini = _.kehadiranHariIni.value;
-                                    return Text(hariini.waktuPulang != null
-                                        ? idTime(hariini.waktuPulang!,
-                                            format: 'HH:mm')
-                                        : '');
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).asGlass(
-                    clipBorderRadius: BorderRadius.circular(8),
-                    blurX: 10,
-                    blurY: 10,
-                    frosted: true,
-                  ),
-                ],
+                          Text(_.hari.value,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 20)),
+                          Visibility(
+                              visible: _.waktu.value ==
+                                  'Gagal mengambil waktu server',
+                              child: InkWell(
+                                  onTap: () => _.getJam(),
+                                  child: const Icon(Icons.refresh)))
+                        ]);
+                  },
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
+            if (controller.isHariIniLihat)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.44,
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            12, 12, 12, 12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Clock-In'),
+                            const Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
+                              child: Text(''),
+                            ),
+                            Container(
+                              width: 80,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(77, 70, 210, 57),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(MdiIcons.clockIn, size: 24),
+                                  GetBuilder<PresensiProvider>(
+                                    init: PresensiProvider(),
+                                    builder: (_) {
+                                      var hariini = _.kehadiranHariIni.value;
+                                      return Text(hariini.waktuHadir != null
+                                          ? idTime(hariini.waktuHadir!,
+                                              format: 'HH:mm')
+                                          : '');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ).asGlass(
+                      clipBorderRadius: BorderRadius.circular(8),
+                      blurX: 10,
+                      blurY: 10,
+                      frosted: true,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.44,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            12, 12, 12, 12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Clock-Out'),
+                            const Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
+                              child: Text(''),
+                            ),
+                            Container(
+                              width: 80,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color(0x9AF06A6A),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(MdiIcons.clockOut, size: 24),
+                                  GetBuilder<PresensiProvider>(
+                                    builder: (_) {
+                                      var hariini = _.kehadiranHariIni.value;
+                                      return Text(hariini.waktuPulang != null
+                                          ? idTime(hariini.waktuPulang!,
+                                              format: 'HH:mm')
+                                          : '');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ).asGlass(
+                      clipBorderRadius: BorderRadius.circular(8),
+                      blurX: 10,
+                      blurY: 10,
+                      frosted: true,
+                    ),
+                  ],
+                ),
+              ),
             Column(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: const [
