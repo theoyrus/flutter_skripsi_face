@@ -226,11 +226,10 @@ class CitrawajahTambahController extends GetxController {
           // int id = citraItems[index].data?['citrawajah_id'];
           SmartDialog.showLoading(msg: 'Mengunggah citra ...');
           await _citraWajahService.uploadCitra(croppedImageItems).then((_) {
-            AppSnackBar.showSnackBar(
-                title: "Done", message: 'Citra berhasil diproses');
-            Future.delayed(const Duration(seconds: 3), () {
-              Get.close(1);
-              Get.back(result: true);
+            Future.delayed(const Duration(seconds: 1), () {
+              Get.back(result: {'action': 'refresh'});
+              AppSnackBar.showSnackBar(
+                  title: "Done", message: 'Citra berhasil diproses');
             });
             _citraWajahService.training();
           }).catchError((_) {

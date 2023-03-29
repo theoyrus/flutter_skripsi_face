@@ -21,9 +21,10 @@ class CitrawajahMyScreen extends GetView<CitrawajahMyController> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          var res = await Get.toNamed(Routes.CITRAWAJAH_TAMBAH);
-          if (res) {
-            controller.onInit();
+          var result = await Get.toNamed(Routes.CITRAWAJAH_TAMBAH);
+          // print('===> resultnya: $result, runtimeType: ${result.runtimeType}, isi action: ${result['action']}');
+          if (result['action'] == 'refresh') {
+            controller.refreshScreen();
           }
         },
         tooltip: 'Tambah Citra Wajah',
