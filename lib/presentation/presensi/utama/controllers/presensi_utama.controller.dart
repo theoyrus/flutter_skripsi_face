@@ -42,6 +42,8 @@ class PresensiUtamaController extends GetxController {
       isBisaClockOut.value = state.value.waktuPulang == null;
     }).catchError((_) {
       refreshCtrl.refreshCompleted();
+      isBisaClockIn.value = true;
+      isBisaClockOut.value = true;
     });
     refreshCtrl.refreshCompleted();
   }

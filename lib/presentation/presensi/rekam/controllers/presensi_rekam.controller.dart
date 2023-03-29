@@ -42,6 +42,7 @@ class PresensiRekamController extends GetxController {
   final cameraPlugin = 'CamerAwesome'.obs;
   bool isImageCaptured = false;
   final faceRecognized = false.obs;
+  final faceRecognizing = false.obs;
 
   List<String> capturedImagesPath = [];
   List<String> croppedImagesPath = [];
@@ -90,7 +91,7 @@ class PresensiRekamController extends GetxController {
         final rightEyeOpenProb = faces[0].rightEyeOpenProbability ?? 0;
         if (leftEyeOpenProb > kedipProb && rightEyeOpenProb > kedipProb) {
           // eyes are open
-          debugPrint('====> MATA TERBUKA');
+          debugPrint('====> MATA TERBUKA, mataTertutup: $mataTertutup');
           if (mataTertutup != 0 && mataTertutup <= 3) {
             debugPrint('====> MATA TERBUKA KEMBALI, $mataTertutup kedipan');
             faceCaptured.value = true;
@@ -188,11 +189,11 @@ class PresensiRekamController extends GetxController {
       int idx = 0;
       await Future.forEach(capturedImagesPath, (String path) async {
         try {
-          await cropFaceFileJob(path).then((croppedPath) {
+          await cropFaceFileJob(path).then((croppedPath) async {
             var citraCek = ImageItem(croppedPath, 'citra-recog');
             croppedImageItems.add(citraCek);
             faceCaptured.value = false;
-            recognize(citraCek);
+            await recognize(citraCek);
             update();
           });
         } catch (e) {
@@ -219,7 +220,8 @@ class PresensiRekamController extends GetxController {
     update();
   }
 
-  void recognize(ImageItem citra) async {
+  Future<void> recognize(ImageItem citra) async {
+    faceRecognizing.value = true;
     SmartDialog.showLoading(msg: 'Memvalidasi citra ...');
     await _citraWajahService.recognize(citra).then((data) {
       faceRecognized.value = true;
@@ -228,17 +230,17 @@ class PresensiRekamController extends GetxController {
     }).catchError((_) {
       AppSnackBar.showErrorSnackBar(title: 'Opps', message: _.toString());
     });
+    faceRecognizing.value = false;
     SmartDialog.dismiss();
   }
 
   void rekam() async {
     SmartDialog.showLoading(msg: 'Merekam presensi ...');
     await _presensiService.rekam(jenis).then((data) {
-      AppSnackBar.showSnackBar(
-          title: "Sukses", message: 'Berhasil rekam presensi :)');
-      Future.delayed(const Duration(seconds: 3), () {
-        Get.close(1);
-        Get.back(result: true);
+      Future.delayed(const Duration(seconds: 1), () {
+        Get.back(result: {'action': 'refresh'});
+        AppSnackBar.showSnackBar(
+            title: "Sukses", message: 'Berhasil rekam presensi :)');
       });
     }).catchError((_) {
       AppSnackBar.showErrorSnackBar(title: 'Opps', message: _.toString());

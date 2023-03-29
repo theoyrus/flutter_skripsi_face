@@ -190,8 +190,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                         child: Obx(
                           () => InkWell(
                             onTap: controller.isBisaClockIn.isTrue
-                                ? () => Get.toNamed(Routes.PRESENSI_REKAM,
-                                    parameters: {'jenis': 'IN'})
+                                ? () async {
+                                    final result = await Get.toNamed(
+                                        Routes.PRESENSI_REKAM,
+                                        parameters: {'jenis': 'IN'});
+                                    // print('===> resultnya: $result, runtimeType: ${result.runtimeType}, isi action: ${result['action']}');
+                                    if (result['action'] == 'refresh') {
+                                      controller.refreshScreen();
+                                    }
+                                  }
                                 : null,
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -220,8 +227,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                           child: Obx(
                             () => InkWell(
                               onTap: controller.isBisaClockOut.isTrue
-                                  ? () => Get.toNamed(Routes.PRESENSI_REKAM,
-                                      parameters: {'jenis': 'OUT'})
+                                  ? () async {
+                                      final result = await Get.toNamed(
+                                          Routes.PRESENSI_REKAM,
+                                          parameters: {'jenis': 'OUT'});
+                                      // print('===> resultnya: $result, runtimeType: ${result.runtimeType}, isi action: ${result['action']}');
+                                      if (result['action'] == 'refresh') {
+                                        controller.refreshScreen();
+                                      }
+                                    }
                                   : null,
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
