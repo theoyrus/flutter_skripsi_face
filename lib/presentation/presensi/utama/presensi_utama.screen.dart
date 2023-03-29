@@ -260,10 +260,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                             () => Visibility(
                               visible: controller.filterEnabled.isTrue,
                               child: InkWell(
-                                  onTap: () => showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          const PresensiUtamaFilter()),
+                                  onTap: () async {
+                                    final filter = await showDialog(
+                                        context: context,
+                                        builder: (_) =>
+                                            const PresensiUtamaFilter());
+                                    controller.listKehadiran(
+                                        tahun: filter['tahun'],
+                                        bulan: filter['bulan']);
+                                  },
                                   child: const Icon(Icons.filter_alt)),
                             ),
                           ),
@@ -274,10 +279,10 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                   ),
                   content: Column(
                     children: [
-                      const Text(
-                        'BULAN INI',
-                        textAlign: TextAlign.left,
-                      ),
+                      Obx(() => Text(
+                            controller.filterResultText.value,
+                            textAlign: TextAlign.left,
+                          )),
                       Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 24),
