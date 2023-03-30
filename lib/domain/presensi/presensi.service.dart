@@ -57,10 +57,21 @@ class PresensiService {
     }
   }
 
-  Future<List<Kehadiran>> kehadiranList({limit = 10, page = 1}) async {
+  Future<List<Kehadiran>> kehadiranList({
+    limit = 10,
+    page = 1,
+    tahun,
+    bulan,
+  }) async {
     try {
-      final res = await _api.dio.get(EndPoints.kehadiran,
-          queryParameters: {'limit': limit, 'page': page});
+      tahun ??= DateTime.now().year;
+      bulan ??= DateTime.now().month;
+      final res = await _api.dio.get(EndPoints.kehadiran, queryParameters: {
+        'limit': limit,
+        'page': page,
+        'tahun': tahun,
+        'bulan': bulan
+      });
       List<Kehadiran> items = (res.data['data'] as List)
           .map((item) => Kehadiran.fromJson(item))
           .toList();

@@ -91,6 +91,7 @@ String fullDateTimeNoSpace(DateTime dateTime) {
 }
 
 String getMonthNameByIdx(int idx, {String langCode = 'en'}) {
+  initializeDateFormatting();
   return DateFormat.MMMM(langCode)
       .format(DateFormat('M').parse(idx.toString()));
 }

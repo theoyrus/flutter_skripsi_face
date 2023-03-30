@@ -12,6 +12,7 @@ import '../../widgets/slideUp.widget.dart';
 class PresensiUtamaFilterController extends GetxController {
   final PanelController panelCtrl = PanelController();
   final filtering = Filtering();
+  GlobalKey<FormBuilderState> fbKey = GlobalKey<FormBuilderState>();
 
   @override
   void onInit() {
@@ -22,7 +23,12 @@ class PresensiUtamaFilterController extends GetxController {
   }
 
   void doSearch() {
-    var qParams = (filtering.generateQueryParams());
+    // var qParams = (filtering.generateQueryParams());
+    var form = fbKey.currentState;
+    form?.save();
+    var fVal = form?.value;
+    // debugPrint('saved ... $fVal');
+    Get.back(result: fVal);
   }
 }
 
@@ -30,23 +36,35 @@ class PresensiUtamaFilter extends StatelessWidget {
   const PresensiUtamaFilter({super.key});
 
   List<Widget> panelSlideUp(PresensiUtamaFilterController c) {
-    int bulanFilter = DateTime.now().month;
-    int tahunFilter = DateTime.now().year;
+    // int bulanFilter = DateTime.now().month;
+    // int tahunFilter = DateTime.now().year;
 
-    List<S2Choice<int>> bulanOpts = List.generate(
-      12,
-      (bulan) => S2Choice<int>(
-          value: bulan + 1,
-          title: getMonthNameByIdx(bulan + 1, langCode: 'id')),
-    );
+    // var initialValue = {
+    //   'bulan': DateTime.now().month,
+    //   'tahun': DateTime.now().year,
+    // };
 
-    List<S2Choice<int>> tahunOpts = List.generate(
-      tahunFilter == 2023 ? 1 : (tahunFilter - 2023 + 1),
-      (tahun) => S2Choice<int>(
-        value: tahunFilter - tahun,
-        title: (tahunFilter - tahun).toString(),
-      ),
-    );
+    // List<S2Choice<int>> bulanS2Opts = List.generate(
+    //   12,
+    //   (bulan) => S2Choice<int>(
+    //       value: bulan + 1,
+    //       title: getMonthNameByIdx(bulan + 1, langCode: 'id')),
+    // );
+
+    // List<S2Choice<int>> tahunS2Opts = List.generate(
+    //   tahunFilter == 2023 ? 1 : (tahunFilter - 2023 + 1),
+    //   (tahun) => S2Choice<int>(
+    //     value: tahunFilter - tahun,
+    //     title: (tahunFilter - tahun).toString(),
+    //   ),
+    // );
+
+    List<MonthOpts> bulanOpts = List.generate(
+        12,
+        (bulan) => MonthOpts(
+              bulan + 1,
+              getMonthNameByIdx(bulan + 1, langCode: 'id'),
+            ));
 
     return [
       const SizedBox(
@@ -68,50 +86,95 @@ class PresensiUtamaFilter extends StatelessWidget {
         height: 10.0,
       ),
       Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(15),
         child: FormBuilder(
-          child: FormBuilderRadioGroup<String>(
-            decoration: const InputDecoration(
-              labelText: 'Rentang Waktu',
-            ),
-            initialValue: null,
-            name: 'range',
-            validator: FormBuilderValidators.compose(
-                [FormBuilderValidators.required()]),
-            options: ['7 hari terakhir', 'Bulan ini']
-                .map((lang) => FormBuilderFieldOption(
-                      value: lang,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(lang),
-                          // Image widget,
-                        ],
+          key: c.fbKey,
+          onChanged: () {
+            c.fbKey.currentState?.save();
+            // debugPrint(c.fbKey.currentState?.value.toString());
+          },
+          // initialValue: c.initialValue,
+          // initialValue: initialValue,
+          child: Column(
+            children: [
+              // FormBuilderRadioGroup<String>(
+              //   decoration: const InputDecoration(
+              //     labelText: 'Rentang Waktu',
+              //   ),
+              //   initialValue: null,
+              //   name: 'range',
+              //   validator: FormBuilderValidators.compose(
+              //       [FormBuilderValidators.required()]),
+              //   options: ['7 hari terakhir', 'Bulan ini']
+              //       .map((lang) => FormBuilderFieldOption(
+              //             value: lang,
+              //             child: Row(
+              //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //               children: [
+              //                 Text(lang),
+              //                 // Image widget,
+              //               ],
+              //             ),
+              //           ))
+              //       .toList(growable: false),
+              //   controlAffinity: ControlAffinity.trailing,
+              // ),
+              const Center(
+                child: Text(
+                  'Filter Data Presensi',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              FormBuilderDropdown(
+                name: 'bulan',
+                items: bulanOpts
+                    .map(
+                      (item) => DropdownMenuItem(
+                        value: item.value,
+                        child: Text(item.title),
                       ),
-                    ))
-                .toList(growable: false),
-            controlAffinity: ControlAffinity.trailing,
+                    )
+                    .toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Bulan',
+                  prefixIcon: Icon(Icons.calendar_month_outlined),
+                ),
+                validator: FormBuilderValidators.required(),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+              FormBuilderTextField(
+                name: 'tahun',
+                decoration: const InputDecoration(
+                  labelText: 'Tahun',
+                  prefixIcon: Icon(Icons.numbers),
+                ),
+                validator: FormBuilderValidators.match(r'^\d{4}$',
+                    errorText: 'isikan tahun'),
+                autovalidateMode: AutovalidateMode.always,
+                keyboardType: TextInputType.number,
+              ),
+            ],
           ),
         ),
       ),
-      SmartSelect<int>.single(
-        title: 'Bulan',
-        choiceItems: bulanOpts,
-        selectedValue: bulanFilter,
-        modalType: S2ModalType.bottomSheet,
-        onChange: (selected) {
-          c.filtering.addFilter('bulan', selected.value);
-        },
-      ),
-      SmartSelect<int>.single(
-        title: 'Tahun',
-        choiceItems: tahunOpts,
-        selectedValue: tahunFilter,
-        modalType: S2ModalType.bottomSheet,
-        onChange: (selected) {
-          c.filtering.addFilter('tahun', selected.value);
-        },
-      ),
+      // SmartSelect<int>.single(
+      //   title: 'Bulan',
+      //   choiceItems: bulanOpts,
+      //   selectedValue: bulanFilter,
+      //   modalType: S2ModalType.bottomSheet,
+      //   onChange: (selected) {
+      //     c.filtering.addFilter('bulan', selected.value);
+      //   },
+      // ),
+      // SmartSelect<int>.single(
+      //   title: 'Tahun',
+      //   choiceItems: tahunOpts,
+      //   selectedValue: tahunFilter,
+      //   modalType: S2ModalType.bottomSheet,
+      //   onChange: (selected) {
+      //     c.filtering.addFilter('tahun', selected.value);
+      //   },
+      // ),
       Padding(
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(

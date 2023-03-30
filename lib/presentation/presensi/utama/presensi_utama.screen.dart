@@ -190,8 +190,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                         child: Obx(
                           () => InkWell(
                             onTap: controller.isBisaClockIn.isTrue
-                                ? () => Get.toNamed(Routes.PRESENSI_REKAM,
-                                    parameters: {'jenis': 'IN'})
+                                ? () async {
+                                    final result = await Get.toNamed(
+                                        Routes.PRESENSI_REKAM,
+                                        parameters: {'jenis': 'IN'});
+                                    // print('===> resultnya: $result, runtimeType: ${result.runtimeType}, isi action: ${result['action']}');
+                                    if (result['action'] == 'refresh') {
+                                      controller.refreshScreen();
+                                    }
+                                  }
                                 : null,
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -220,8 +227,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                           child: Obx(
                             () => InkWell(
                               onTap: controller.isBisaClockOut.isTrue
-                                  ? () => Get.toNamed(Routes.PRESENSI_REKAM,
-                                      parameters: {'jenis': 'OUT'})
+                                  ? () async {
+                                      final result = await Get.toNamed(
+                                          Routes.PRESENSI_REKAM,
+                                          parameters: {'jenis': 'OUT'});
+                                      // print('===> resultnya: $result, runtimeType: ${result.runtimeType}, isi action: ${result['action']}');
+                                      if (result['action'] == 'refresh') {
+                                        controller.refreshScreen();
+                                      }
+                                    }
                                   : null,
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
@@ -260,10 +274,15 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                             () => Visibility(
                               visible: controller.filterEnabled.isTrue,
                               child: InkWell(
-                                  onTap: () => showDialog(
-                                      context: context,
-                                      builder: (_) =>
-                                          const PresensiUtamaFilter()),
+                                  onTap: () async {
+                                    final filter = await showDialog(
+                                        context: context,
+                                        builder: (_) =>
+                                            const PresensiUtamaFilter());
+                                    controller.listKehadiran(
+                                        tahun: filter['tahun'],
+                                        bulan: filter['bulan']);
+                                  },
                                   child: const Icon(Icons.filter_alt)),
                             ),
                           ),
@@ -274,10 +293,10 @@ class PresensiUtamaScreen extends GetView<PresensiUtamaController> {
                   ),
                   content: Column(
                     children: [
-                      const Text(
-                        'BULAN INI',
-                        textAlign: TextAlign.left,
-                      ),
+                      Obx(() => Text(
+                            controller.filterResultText.value,
+                            textAlign: TextAlign.left,
+                          )),
                       Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 24),

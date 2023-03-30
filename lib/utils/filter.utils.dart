@@ -6,6 +6,13 @@ class FilterItem {
   FilterItem(this.name, this.value);
 }
 
+class MonthOpts {
+  final int value;
+  final String title;
+
+  MonthOpts(this.value, this.title);
+}
+
 class Filtering {
   List<FilterItem> filters = [];
 
